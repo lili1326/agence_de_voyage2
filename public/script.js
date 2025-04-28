@@ -1,6 +1,8 @@
+console.log(" script.js chargé");
 fetch('/voyages')
   .then(res => res.json())
   .then(data => {
+    console.log("Données reçues du backend :", data);
     const tbody = document.querySelector('#voyagesTable tbody');
     const select = document.getElementById('filterPays');
     const titres = document.getElementById('searchInput');
@@ -18,6 +20,7 @@ fetch('/voyages')
         <td>${voyage.datesDisponibles.map(date => new Date(date).toLocaleDateString()).join(', ')}</td>`;
       tbody.appendChild(row);
       paysSet.add(voyage.pays);
+      console.log("Fin traitement des données");
     });
 
     select.innerHTML = '<option value="">Tous les pays</option>';
@@ -41,4 +44,7 @@ fetch('/voyages')
         row.style.display = !val || row.children[1].textContent === val ? '' : 'none';
       });
     });
+  })
+  .catch(err => {
+    console.error(" Erreur lors du fetch /voyages :", err);
   });

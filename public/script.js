@@ -1,8 +1,8 @@
-console.log(" script.js chargé");
-fetch('/voyages')
+ console.log("script.js chargé");
+
+ fetch('http://localhost:3001/voyages')
   .then(res => res.json())
   .then(data => {
-    console.log("Données reçues du backend :", data);
     const tbody = document.querySelector('#voyagesTable tbody');
     const select = document.getElementById('filterPays');
     const titres = document.getElementById('searchInput');
@@ -20,7 +20,6 @@ fetch('/voyages')
         <td>${voyage.datesDisponibles.map(date => new Date(date).toLocaleDateString()).join(', ')}</td>`;
       tbody.appendChild(row);
       paysSet.add(voyage.pays);
-      console.log("Fin traitement des données");
     });
 
     select.innerHTML = '<option value="">Tous les pays</option>';
@@ -46,5 +45,35 @@ fetch('/voyages')
     });
   })
   .catch(err => {
-    console.error(" Erreur lors du fetch /voyages :", err);
+    console.error("Erreur lors du fetch /voyages :", err);
   });
+
+  // ajouter un voyage 
+  document.getElementById('voyageForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const data = {
+    titre: document.getElementById('titre').value,
+    description: document.getElementById('description').value,
+    pays: document.getElementById('pays').value,
+    prix: Number(document.getElementById('prix').value),
+    placesDispo: Number(document.getElementById('placesDispo').value),
+    datesDisponibles: [
+      new Date(document.getElementById('date1').value),
+      ...(document.getElementById('date2').value ? [new Date(document.getElementById('date2').value)] : [])
+    ]
+  };
+
+  const response = await fetch('http://localhost:3001/voyages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  if (response.ok) {
+    alert(' Voyage ajouté !');
+    window.location.reload(); // Recharge pour voir le nouveau voyage
+  } else {
+    alert(' Erreur lors de l’ajout');
+  }
+});
